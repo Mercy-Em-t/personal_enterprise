@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(CLIENT)
+  createdAt    DateTime     @default(now())
+  proposals    Proposal[]
+  clientPII    ClientPII?
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  name        String
+  type        ServiceType
+  basePrice   Float
+}
+
+model Proposal {
+  id          String   @id @default(uuid())
+  clientId    String
+  client      User     @relation(fields: [clientId], references: [id])
+  subtotal    Float
+  status      ProposalStatus @default(DRAFT)
+  createdAt   DateTime @default(now())
+}
+
+model ClientPII {
+  id                   String @id @default(uuid())
+  userId               String @unique
+  user                 User   @relation(fields: [userId], references: [id])
+  encryptedBillingData String // AES-256-GCM Encrypted
+  encryptedContactData String // AES-256-GCM Encrypted
+}
+
+model Lead {
+  id          String     @id @default(uuid())
+  blueprintId String?
+  blueprint   ServiceBlueprint? @relation(fields: [blueprintId], references: [id])
+  name        String
+  email       String
+  service     String
+  message   String
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+  insight   AiInsight?
+}
+
+model AiInsight {
+  id                  String   @id @default(uuid())
+  leadId              String   @unique
+  lead                Lead     @relation(fields: [leadId], references: [id])
+  estimatedBudget     Float?
+  urgencyScore        Int?     // 1-10
+  techStack           String[]
+  recommendedServices String[] // Array of Service IDs
+  riskAnalysis        String?
+  interviewTranscript String?  // JSON string of chat history
+  finalReport         String?  // The AI's summary of the interview
+  createdAt           DateTime @default(now())
+}
+
+enum LeadStatus {
+  NEW
+  INTERVIEW_PENDING
+  INTERVIEW_COMPLETED
+  READY_FOR_REVIEW
+}
+
+model ServiceBlueprint {
+  id               String   @id @default(uuid())
+  serviceType      String   @unique // e.g., 'auditor', 'architect', 'tailor'
+  displayName      String
+  groundworkSchema String   // JSON string of the dynamic questions to ask
+  leads            Lead[]
+  createdAt        DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum ServiceType {
+  CORE
+  MICROSERVICE
+  UPSELL
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  PAID
+}
