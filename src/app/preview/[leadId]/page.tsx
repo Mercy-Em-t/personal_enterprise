@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, use } from 'react';
 import AntiScreenshot from '@/components/AntiScreenshot';
 
