@@ -219,7 +219,6 @@ export default function Home() {
                           onKeyDown={handleTerminalCommand}
                           className="flex-1 bg-transparent border-none outline-none text-gray-300 font-mono shadow-none focus:ring-0"
                           autoComplete="off"
-                          autoFocus
                         />
                     </div>
                 </div>
