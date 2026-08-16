@@ -358,7 +358,7 @@ export default function Home() {
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 <span className="font-mono text-gray-400 text-xs tracking-wider">GLOBAL INFRASTRUCTURE: UPTIME 99.99% | API LATENCY 42MS | ACTIVE NODES: 12</span>
             </div>
-            <p className="font-mono text-gray-500 text-sm mb-6">&copy; 2026 Tryphen eMurugat. All rights reserved.</p>
+            <p className="font-mono text-gray-500 text-sm mb-6">&copy; 2026 Tryphen Emurugat. All rights reserved.</p>
             <div className="flex flex-wrap justify-center gap-6 text-sm font-medium">
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">GitHub</a>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">LinkedIn</a>
