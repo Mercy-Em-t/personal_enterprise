@@ -8,6 +8,35 @@ export default function Home() {
     "Welcome to Tryphen Emurugat's interactive server. Type <span class='text-pink-500'>help</span> for a list of commands."
   ]);
 
+  // Contact Form State
+  const [formData, setFormData] = useState({ name: '', email: '', service: 'System Architecture', message: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formMessage, setFormMessage] = useState('');
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('submitting');
+    try {
+      const res = await fetch('/api/inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setFormStatus('success');
+        setFormMessage(data.message);
+        setFormData({ name: '', email: '', service: 'System Architecture', message: '' });
+      } else {
+        setFormStatus('error');
+        setFormMessage(data.error || 'Something went wrong.');
+      }
+    } catch (err) {
+      setFormStatus('error');
+      setFormMessage('Network error. Please try again.');
+    }
+  };
+
   const handleTerminalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const command = terminalInput.trim().toLowerCase();
@@ -225,8 +254,105 @@ export default function Home() {
         </section>
 
       </main>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-24 relative z-10">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Start a <span className="text-yellow-500">Project</span></h2>
+            <p className="text-gray-400 text-lg">Currently accepting inquiries for Q3/Q4 2026. Let's discuss your architecture needs.</p>
+          </div>
+
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 md:p-12 shadow-2xl">
+            {formStatus === 'success' ? (
+              <div className="text-center py-12 animate-in fade-in zoom-in duration-500">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-green-500 text-2xl">✓</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">Inquiry Received</h3>
+                <p className="text-gray-400 mb-8">{formMessage}</p>
+                <button onClick={() => setFormStatus('idle')} className="text-yellow-500 hover:text-yellow-400 font-medium">
+                  Submit another inquiry
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Full Name</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
+                    <input 
+                      type="email" 
+                      required 
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
+                      placeholder="john@company.com"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Area of Interest</label>
+                  <select 
+                    value={formData.service}
+                    onChange={(e) => setFormData({...formData, service: e.target.value})}
+                    className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors appearance-none"
+                  >
+                    <option>System Architecture</option>
+                    <option>Automated E-Commerce Pipelines</option>
+                    <option>Enterprise AI Agents</option>
+                    <option>Security & Auditing</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Project Brief</label>
+                  <textarea 
+                    required 
+                    rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-yellow-500 transition-colors resize-none"
+                    placeholder="Tell me about your constraints, timeline, and goals..."
+                  ></textarea>
+                </div>
+
+                {formStatus === 'error' && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm">
+                    {formMessage}
+                  </div>
+                )}
+
+                <button 
+                  type="submit" 
+                  disabled={formStatus === 'submitting'}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-4 rounded-lg transition-colors flex justify-center items-center gap-2"
+                >
+                  {formStatus === 'submitting' ? (
+                    <>
+                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                      Processing...
+                    </>
+                  ) : 'Initialize Engagement'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
       
-      <footer className="py-16 text-center border-t border-white/10 relative z-10 bg-black mt-20">
+      <footer className="py-16 text-center border-t border-white/10 relative z-10 bg-black mt-10">
         <div className="max-w-7xl mx-auto px-6">
             <div className="inline-flex items-center gap-3 bg-[#111] border border-white/10 px-6 py-2 rounded-full mb-8">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
