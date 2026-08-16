@@ -8,9 +8,9 @@ export default function Home() {
     "Welcome to Tryphen Emurugat's interactive server. Type <span class='text-pink-500'>help</span> for a list of commands."
   ]);
 
-  const handleTerminalCommand = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      const command = terminalInput.trim().toLowerCase();
+  const handleTerminalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const command = terminalInput.trim().toLowerCase();
       let response = '';
 
       if (command === 'help') {
@@ -44,7 +44,6 @@ export default function Home() {
       
       setTerminalHistory(newHistory);
       setTerminalInput('');
-    }
   };
 
   return (
@@ -209,18 +208,17 @@ export default function Home() {
                     {terminalHistory.map((line, i) => (
                       <div key={i} className="mb-2" dangerouslySetInnerHTML={{ __html: line }}></div>
                     ))}
-                    <div className="flex items-center gap-2 mt-2">
+                    <form onSubmit={handleTerminalSubmit} className="flex items-center gap-2 mt-2 w-full">
                         <span className="text-green-400 whitespace-nowrap">guest@tryphenemurugat:~$</span>
                         <input 
                           id="terminal-input"
                           type="text" 
                           value={terminalInput}
                           onChange={(e) => setTerminalInput(e.target.value)}
-                          onKeyDown={handleTerminalCommand}
                           className="flex-1 bg-transparent border-none outline-none text-gray-300 font-mono shadow-none focus:ring-0"
                           autoComplete="off"
                         />
-                    </div>
+                    </form>
                 </div>
             </div>
           </div>
